@@ -4,17 +4,22 @@ import com.cursoreact.financas.api.dto.UsuarioDTO;
 import com.cursoreact.financas.exception.ErroAutenticacao;
 import com.cursoreact.financas.exception.RegraNegocioException;
 import com.cursoreact.financas.model.entity.Usuario;
+import com.cursoreact.financas.service.LancamentoService;
 import com.cursoreact.financas.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
+import java.util.Optional;
+
 @RestController
 @RequestMapping("/api/usuarios")
 public class UsuarioResource {
 
     private UsuarioService usuarioService;
+    private LancamentoService lancamentoService;
 
     @Autowired
     public UsuarioResource(UsuarioService usuarioService){
@@ -44,6 +49,17 @@ public class UsuarioResource {
         }
     }
 
+    @GetMapping("{id}/saldo")
+    public ResponseEntity obterSaldo(@PathVariable("id") Long id){
+       Optional<Usuario> usuario = usuarioService.obterPorId(id);
 
+       if (!usuario.isPresent()){
+           return new ResponseEntity(HttpStatus.NOT_FOUND);
+       }
+
+       BigDecimal saldo = lancamentoService.obterSaldoPorUsuario(id);
+
+       return  ResponseEntity.ok(saldo);
+    }
 
 }

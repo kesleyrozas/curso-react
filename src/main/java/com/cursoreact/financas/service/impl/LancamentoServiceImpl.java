@@ -3,6 +3,7 @@ package com.cursoreact.financas.service.impl;
 import com.cursoreact.financas.exception.RegraNegocioException;
 import com.cursoreact.financas.model.entity.Lancamento;
 import com.cursoreact.financas.model.enums.StatusLancamento;
+import com.cursoreact.financas.model.enums.TipoLancamento;
 import com.cursoreact.financas.model.repository.LancamentoRepository;
 import com.cursoreact.financas.service.LancamentoService;
 import org.springframework.data.domain.Example;
@@ -90,5 +91,21 @@ public class LancamentoServiceImpl implements LancamentoService {
     @Override
     public Optional<Lancamento> obterPorId(Long id) {
         return lancamentoRepository.findById(id);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public BigDecimal obterSaldoPorUsuario(Long id) {
+        BigDecimal receitas = lancamentoRepository.obterSaldoPorTipoLancamentoEUsuario(id, TipoLancamento.RECEITA);
+        BigDecimal despesas = lancamentoRepository.obterSaldoPorTipoLancamentoEUsuario(id, TipoLancamento.DESPESA);
+
+        if (receitas == null){
+            receitas = BigDecimal.ZERO;
+        }
+        if (despesas == null){
+            despesas = BigDecimal.ZERO;
+        }
+
+        return receitas.subtract(despesas);
     }
 }
