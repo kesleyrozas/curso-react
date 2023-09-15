@@ -19,6 +19,7 @@ import java.util.Optional;
 public class UsuarioResource {
 
     private UsuarioService usuarioService;
+    @Autowired
     private LancamentoService lancamentoService;
 
     @Autowired
